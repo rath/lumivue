@@ -30,10 +30,11 @@
     }
   },
   "action": {
-    "default_title": "LumiVue Options",
+    "default_title": "LumiVue Settings",
     "default_popup": "options.html"
   },
   "host_permissions": [
-    "https://api.openai.com/"
+    "https://api.openai.com/",
+    "https://api.groq.com/"
   ]
 }

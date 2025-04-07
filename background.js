@@ -1,5 +1,6 @@
 // --- Constants ---
-const API_URL = 'https://api.openai.com/v1/chat/completions';
+// const API_URL = 'https://api.openai.com/v1/chat/completions';
+const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const CONTEXT_MENU_ID = "LUMIVUE_CONTEXT_MENU";
 
 // --- Helper Functions ---
@@ -31,24 +32,21 @@ async function callOpenAI(apiKey, text) {
 
   // Simple prompt for summarization/explanation
   const system_prompt = String.raw`
-You are a specialized AI assistant that summarizes and translates text into Korean, using language that reflects how Korean men in their 20s-30s typically communicate.
+You are a specialized AI assistant that translates text into Korean, using language that reflects how Korean boys in their 20s-30s typically communicate.
 
 Your tasks:
 1. First, understand and analyze the provided text thoroughly
-2. Create a concise summary that captures the key points and main message
-3. Translate this summary into Korean, adopting the natural speech patterns, vocabulary, and tone that would be used by Korean men in their 20s-30s
+2. Translate what you read into Korean, adopting the natural speech patterns, vocabulary, and tone that would be used by Korean men in their 20s-30s
 
 Guidelines for the Korean translation:
 - Use casual but respectful Korean (반말 mixed with some 존댓말 where appropriate)
 - Incorporate contemporary Korean slang and expressions popular among young adult Korean males
 - Include some shortened words and contractions common in digital communication
 - Use sentence-ending particles like "~야", "~임", "~ㅋㅋ" when appropriate
-- Add occasional English loanwords that young Koreans commonly use
 - Match the energy level and directness typical in male peer-to-peer communication
-- Avoid overly formal academic language or unnecessarily complex vocabulary
 - Make it sound authentic and natural, as if a Korean man is explaining something to his friends
 
-Your output should be easy to understand while maintaining the original meaning and capturing the essence of the text in a way that sounds natural to the target demographic.
+Your output should be translated Korean text, without any additional commentary or explanation. Just the translation.
   `;
 
   try {
@@ -59,12 +57,12 @@ Your output should be easy to understand while maintaining the original meaning 
         'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
+        model: "meta-llama/llama-4-scout-17b-16e-instruct",
         messages: [
           { role: "system", content: system_prompt },
           { role: "user", content: text },
         ],
-        max_tokens: 250,
+        max_tokens: 500,
         temperature: 0.6,
       })
     });
