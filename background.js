@@ -79,7 +79,7 @@ function displayResultInContentScript(tabId, resultText, position) {
     chrome.tabs.sendMessage(tabId, {
         action: "displayResult",
         text: resultText,
-        position: position // Pass position info
+        position: position,
     });
 }
 
@@ -143,12 +143,13 @@ chrome.commands.onCommand.addListener(async (command, tab) => {
             return;
         }
         if (response && response.text) {
-            displayResultInContentScript(tab.id, "Processing...", response.position); // Show loading state
+            const position = response.position || { x: 0, y: 0 };
+            displayResultInContentScript(tab.id, "Processing...", position);
             const result = await callOpenAI(settings.apiKey, response.text, settings.systemPrompt);
-            displayResultInContentScript(tab.id, result, response.position);
+            displayResultInContentScript(tab.id, result, position);
         } else {
             console.log("No text received from content script for shortcut.");
-             displayResultInContentScript(tab.id, "Could not get text from page or selection.", null);
+            displayResultInContentScript(tab.id, "Could not get text from page or selection.", null);
         }
     });
   }
