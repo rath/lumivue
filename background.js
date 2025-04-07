@@ -1,5 +1,6 @@
 // --- Constants ---
 // const API_URL = 'https://api.openai.com/v1/chat/completions';
+// const API_URL = 'http://127.0.0.1:8080/v1/chat/completions';
 const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const CONTEXT_MENU_ID = "LUMIVUE_CONTEXT_MENU";
 
@@ -32,7 +33,7 @@ async function callOpenAI(apiKey, text) {
 
   // Simple prompt for summarization/explanation
   const system_prompt = String.raw`
-You are a specialized AI assistant that translates text into Korean, using language that reflects how Korean boys in their 20s-30s typically communicate.
+You are a specialized AI assistant that translates text into Korean, using language that reflects how Korean boys typically communicate.
 
 Your tasks:
 1. First, understand and analyze the provided text thoroughly
@@ -44,7 +45,6 @@ Guidelines for the Korean translation:
 - Include some shortened words and contractions common in digital communication
 - Use sentence-ending particles like "~야", "~임", "~ㅋㅋ" when appropriate
 - Match the energy level and directness typical in male peer-to-peer communication
-- Make it sound authentic and natural, as if a Korean man is explaining something to his friends
 
 Your output should be translated Korean text, without any additional commentary or explanation. Just the translation.
   `;
