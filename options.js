@@ -1,15 +1,19 @@
-import { getDefaultSystemPrompt } from './utils.js';
+import { getDefaultSystemPrompt, getDefaultMaxTokens, getDefaultTemperature } from './utils.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const apiKeyInput = document.getElementById('apiKey');
   const systemPromptInput = document.getElementById('systemPrompt');
+  const maxTokensInput = document.getElementById('maxTokens');
+  const maxTokensValue = document.getElementById('maxTokensValue');
+  const temperatureInput = document.getElementById('temperature');
+  const temperatureValue = document.getElementById('temperatureValue');
   const saveButton = document.getElementById('saveButton');
   const resetPromptButton = document.getElementById('resetPromptButton');
   const statusSpan = document.getElementById('status');
   const toggleApiKeyButton = document.getElementById('toggleApiKey');
 
   // Load saved settings on page load
-  chrome.storage.sync.get(['openaiApiKey', 'systemPrompt'], (data) => {
+  chrome.storage.sync.get(['openaiApiKey', 'systemPrompt', 'maxTokens', 'temperature'], (data) => {
     if (data.openaiApiKey) {
       apiKeyInput.value = data.openaiApiKey;
     }
@@ -19,6 +23,25 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       systemPromptInput.value = getDefaultSystemPrompt();
     }
+
+    // Set max tokens with default fallback
+    const maxTokens = data.maxTokens !== undefined ? data.maxTokens : getDefaultMaxTokens();
+    maxTokensInput.value = maxTokens;
+    maxTokensValue.textContent = maxTokens;
+
+    // Set temperature with default fallback
+    const temperature = data.temperature !== undefined ? data.temperature : getDefaultTemperature();
+    temperatureInput.value = temperature;
+    temperatureValue.textContent = temperature;
+  });
+
+  // Update displayed values when sliders change
+  maxTokensInput.addEventListener('input', () => {
+    maxTokensValue.textContent = maxTokensInput.value;
+  });
+
+  temperatureInput.addEventListener('input', () => {
+    temperatureValue.textContent = temperatureInput.value;
   });
 
   // Toggle API key visibility
@@ -45,33 +68,31 @@ document.addEventListener('DOMContentLoaded', () => {
   saveButton.addEventListener('click', () => {
     const apiKey = apiKeyInput.value.trim();
     const systemPrompt = systemPromptInput.value.trim();
+    const maxTokens = parseInt(maxTokensInput.value);
+    const temperature = parseFloat(temperatureInput.value);
 
     const settings = {};
-    let message = '';
 
     // Handle API key
     if (apiKey) {
       settings.openaiApiKey = apiKey;
-      message += 'API Key saved! ';
     } else {
       // Clear the key if the input is empty
       chrome.storage.sync.remove('openaiApiKey');
-      message += 'API Key cleared. ';
     }
 
     // Handle system prompt
     if (systemPrompt) {
       settings.systemPrompt = systemPrompt;
-      message += 'System prompt saved!';
     } else {
       // Set to default if empty
       settings.systemPrompt = getDefaultSystemPrompt();
-      message += 'System prompt set to default.';
     }
 
-    // Save all settings
+    settings.maxTokens = maxTokens;
+    settings.temperature = temperature;
+
     chrome.storage.sync.set(settings, () => {
-      showStatus(message, 'green');
       console.log('Settings saved:', settings);
     });
   });

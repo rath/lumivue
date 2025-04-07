@@ -1,4 +1,4 @@
-import { getDefaultSystemPrompt } from './utils.js';
+import { getDefaultSystemPrompt, getDefaultMaxTokens, getDefaultTemperature } from './utils.js';
 
 // --- Constants ---
 // const API_URL = 'https://api.openai.com/v1/chat/completions';
@@ -13,10 +13,12 @@ const CONTEXT_MENU_ID = "LUMIVUE_CONTEXT_MENU";
  * @returns {Promise<Object>} Object containing API key and system prompt.
  */
 async function getStoredSettings() {
-  const result = await chrome.storage.sync.get(['openaiApiKey', 'systemPrompt']);
+  const result = await chrome.storage.sync.get(['openaiApiKey', 'systemPrompt', 'maxTokens', 'temperature']);
   return {
     apiKey: result.openaiApiKey || null,
-    systemPrompt: result.systemPrompt || getDefaultSystemPrompt()
+    systemPrompt: result.systemPrompt || getDefaultSystemPrompt(),
+    maxTokens: result.maxTokens !== undefined ? result.maxTokens : getDefaultMaxTokens(),
+    temperature: result.temperature !== undefined ? result.temperature : getDefaultTemperature(),
   };
 }
 
@@ -26,7 +28,7 @@ async function getStoredSettings() {
  * @param {string} text - The text to process.
  * @returns {Promise<string>} The processed text from OpenAI.
  */
-async function callOpenAI(apiKey, text, systemPrompt) {
+async function callOpenAI(apiKey, text, settings) {
   if (!text || text.trim().length === 0) {
     return "No text provided.";
   }
@@ -46,11 +48,11 @@ async function callOpenAI(apiKey, text, systemPrompt) {
       body: JSON.stringify({
         model: "meta-llama/llama-4-scout-17b-16e-instruct",
         messages: [
-          { role: "system", content: systemPrompt },
+          { role: "system", content: settings.systemPrompt },
           { role: "user", content: text },
         ],
-        max_tokens: 500,
-        temperature: 0.6,
+        max_tokens: settings.maxTokens,
+        temperature: settings.temperature,
       })
     });
 
@@ -115,7 +117,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
         }
         if (response && response.text) {
             displayResultInContentScript(tab.id, "Processing...", response.position); // Show loading state
-            const result = await callOpenAI(settings.apiKey, response.text, settings.systemPrompt);
+            const result = await callOpenAI(settings.apiKey, response.text, settings);
             displayResultInContentScript(tab.id, result, response.position);
         } else {
             console.log("No text received from content script or context menu.");
@@ -145,7 +147,7 @@ chrome.commands.onCommand.addListener(async (command, tab) => {
         if (response && response.text) {
             const position = response.position || { x: 0, y: 0 };
             displayResultInContentScript(tab.id, "Processing...", position);
-            const result = await callOpenAI(settings.apiKey, response.text, settings.systemPrompt);
+            const result = await callOpenAI(settings.apiKey, response.text, settings);
             displayResultInContentScript(tab.id, result, position);
         } else {
             console.log("No text received from content script for shortcut.");

@@ -20,3 +20,11 @@ Guidelines for the Korean translation:
 Your output should be translated Korean text, without any additional commentary or explanation. Just the translation.
   `.trim();
 }
+
+export function getDefaultMaxTokens() {
+  return 1000;
+}
+
+export function getDefaultTemperature() {
+  return 0.6;
+}
