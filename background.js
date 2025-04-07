@@ -1,11 +1,7 @@
 import { getDefaultSystemPrompt, getDefaultMaxTokens, getDefaultTemperature, getDefaultModel } from './utils.js';
 
-// --- Constants ---
-// const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 const CONTEXT_MENU_ID = "LUMIVUE_CONTEXT_MENU";
-
-// --- Helper Functions ---
 
 /**
  * Fetches the API key and system prompt from storage.
@@ -93,9 +89,6 @@ function displayResultInContentScript(tabId, resultText, position) {
     });
 }
 
-
-// --- Event Listeners ---
-
 // Create Context Menu on install/update
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
@@ -135,7 +128,6 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     });
   }
 });
-
 
 // Listen for Keyboard Shortcut
 chrome.commands.onCommand.addListener(async (command, tab) => {

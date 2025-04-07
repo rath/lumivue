@@ -1,7 +1,4 @@
-// --- Globals ---
 let resultPopup = null;
-
-// --- Helper Functions ---
 
 /**
  * Gets the currently selected text on the page.
