@@ -7,32 +7,23 @@ const CONTEXT_MENU_ID = "LUMIVUE_CONTEXT_MENU";
 // --- Helper Functions ---
 
 /**
- * Fetches the API key from storage.
- * @returns {Promise<string|null>} The API key or null if not found.
+ * Fetches the API key and system prompt from storage.
+ * @returns {Promise<Object>} Object containing API key and system prompt.
  */
-async function getApiKey() {
-  const result = await chrome.storage.sync.get('openaiApiKey');
-  return result.openaiApiKey || null;
+async function getStoredSettings() {
+  const result = await chrome.storage.sync.get(['openaiApiKey', 'systemPrompt']);
+  return {
+    apiKey: result.openaiApiKey || null,
+    systemPrompt: result.systemPrompt || getDefaultSystemPrompt()
+  };
 }
 
 /**
- * Calls the OpenAI API.
- * @param {string} apiKey - The OpenAI API key.
- * @param {string} text - The text to process.
- * @returns {Promise<string>} The processed text from OpenAI.
+ * Returns the default system prompt.
+ * @returns {string} The default system prompt.
  */
-async function callOpenAI(apiKey, text) {
-  if (!text || text.trim().length === 0) {
-    return "No text provided.";
-  }
-  if (!apiKey) {
-    // Direct the user to the options page if the key is missing
-    chrome.runtime.openOptionsPage();
-    return "OpenAI API key not set. Please set it in the extension options.";
-  }
-
-  // Simple prompt for summarization/explanation
-  const system_prompt = String.raw`
+function getDefaultSystemPrompt() {
+  return String.raw`
 You are a specialized AI assistant that translates text into Korean, using language that reflects how Korean boys typically communicate.
 
 Your tasks:
@@ -48,6 +39,23 @@ Guidelines for the Korean translation:
 
 Your output should be translated Korean text, without any additional commentary or explanation. Just the translation.
   `;
+}
+
+/**
+ * Calls the OpenAI API.
+ * @param {string} apiKey - The OpenAI API key.
+ * @param {string} text - The text to process.
+ * @returns {Promise<string>} The processed text from OpenAI.
+ */
+async function callOpenAI(apiKey, text, systemPrompt) {
+  if (!text || text.trim().length === 0) {
+    return "No text provided.";
+  }
+  if (!apiKey) {
+    // Direct the user to the options page if the key is missing
+    chrome.runtime.openOptionsPage();
+    return "OpenAI API key not set. Please set it in the extension options.";
+  }
 
   try {
     const response = await fetch(API_URL, {
@@ -59,7 +67,7 @@ Your output should be translated Korean text, without any additional commentary 
       body: JSON.stringify({
         model: "meta-llama/llama-4-scout-17b-16e-instruct",
         messages: [
-          { role: "system", content: system_prompt },
+          { role: "system", content: systemPrompt },
           { role: "user", content: text },
         ],
         max_tokens: 500,
@@ -112,8 +120,8 @@ chrome.runtime.onInstalled.addListener(() => {
 // Listen for Context Menu clicks
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   if (info.menuItemId === CONTEXT_MENU_ID && tab?.id) {
-    const apiKey = await getApiKey();
-    if (!apiKey) {
+    const settings = await getStoredSettings();
+    if (!settings.apiKey) {
         displayResultInContentScript(tab.id, "OpenAI API key not set. Please set it in the extension options.", null);
         chrome.runtime.openOptionsPage();
         return;
@@ -128,7 +136,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
         }
         if (response && response.text) {
             displayResultInContentScript(tab.id, "Processing...", response.position); // Show loading state
-            const result = await callOpenAI(apiKey, response.text);
+            const result = await callOpenAI(settings.apiKey, response.text, settings.systemPrompt);
             displayResultInContentScript(tab.id, result, response.position);
         } else {
             console.log("No text received from content script or context menu.");
@@ -142,8 +150,8 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 // Listen for Keyboard Shortcut
 chrome.commands.onCommand.addListener(async (command, tab) => {
   if (command === "trigger-lumivue" && tab?.id) {
-    const apiKey = await getApiKey();
-     if (!apiKey) {
+    const settings = await getStoredSettings();
+     if (!settings.apiKey) {
         displayResultInContentScript(tab.id, "OpenAI API key not set. Please set it in the extension options.", null);
         chrome.runtime.openOptionsPage();
         return;
@@ -157,7 +165,7 @@ chrome.commands.onCommand.addListener(async (command, tab) => {
         }
         if (response && response.text) {
             displayResultInContentScript(tab.id, "Processing...", response.position); // Show loading state
-            const result = await callOpenAI(apiKey, response.text);
+            const result = await callOpenAI(settings.apiKey, response.text, settings.systemPrompt);
             displayResultInContentScript(tab.id, result, response.position);
         } else {
             console.log("No text received from content script for shortcut.");

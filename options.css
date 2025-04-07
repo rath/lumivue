@@ -27,12 +27,21 @@ label {
 }
 
 input[type="password"],
-input[type="text"] { /* Added text for potential future fields */
-  width: calc(100% - 22px); /* Adjust width considering padding/border */
+input[type="text"],
+textarea {
+  width: calc(100% - 22px);
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  margin-bottom: 10px; /* Space before button */
+  margin-bottom: 10px;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 150px;
+  font-family: monospace;
+  font-size: 13px;
+  line-height: 1.4;
 }
 
 button {
