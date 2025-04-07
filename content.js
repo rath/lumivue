@@ -1,15 +1,27 @@
 // --- Globals ---
 let resultPopup = null;
-let lastMousePosition = { x: 0, y: 0 };
 
 // --- Helper Functions ---
 
 /**
  * Gets the currently selected text on the page.
- * @returns {string} The selected text.
+ * @returns {object} The selected text and its position.
  */
 function getSelectedText() {
-  return window.getSelection().toString().trim();
+  const selection = window.getSelection();
+  const text = selection.toString().trim();
+
+  let position = null;
+  if (text && selection.rangeCount > 0) {
+    const range = selection.getRangeAt(0);
+    const rect = range.getBoundingClientRect();
+    position = {
+      x: rect.left + (rect.width / 2),
+      y: rect.bottom
+    };
+  }
+
+  return { text, position };
 }
 
 /**
@@ -30,7 +42,6 @@ function getPageText() {
     // Basic text extraction, could be improved (e.g., exclude nav/footer)
     return targetElement.innerText.trim();
 }
-
 
 /**
  * Creates or updates the result popup element.
@@ -59,7 +70,6 @@ function showResultPopup(text, position) {
     }
   };
   resultPopup.appendChild(closeButton);
-
 
   // Positioning
   if (position) {
@@ -92,15 +102,6 @@ function handleClickOutside(event) {
     }
 }
 
-
-// --- Event Listeners ---
-
-// Keep track of the last mouse position for context menu clicks
-document.addEventListener('mousedown', (event) => {
-    lastMousePosition = { x: event.clientX, y: event.clientY };
-}, true); // Use capture phase to get position before context menu potentially blocks it
-
-
 // Listen for messages from the background script
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "displayResult") {
@@ -108,18 +109,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   } else if (request.action === "getText") {
     let text = "";
     let position = null; // Position where the action was triggered
-
-    if (request.source === "contextMenu") {
-        text = request.selectionText || getPageText(); // Use selection if available, else page
-        position = lastMousePosition; // Use the last recorded mouse position
-    } else if (request.source === "shortcut") {
-        text = getSelectedText() || getPageText(); // Prioritize selection for shortcut too
-        // For shortcut, we don't have a specific click position,
-        // so we might center it or position relative to selection (more complex)
-        // Let's pass null to center it for now.
-        position = null;
+    const selectionData = getSelectedText();
+    if (selectionData.text) {
+        text = selectionData.text;
+        position = selectionData.position;
+    } else {
+        text = getPageText();
     }
-
     sendResponse({ text: text, position: position });
   }
 });

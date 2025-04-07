@@ -107,7 +107,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     }
 
     // Send message to content script to get text and position
-    chrome.tabs.sendMessage(tab.id, { action: "getText", source: "contextMenu", selectionText: info.selectionText }, async (response) => {
+    chrome.tabs.sendMessage(tab.id, { action: "getText", source: "contextMenu" }, async (response) => {
         if (chrome.runtime.lastError) {
             console.error("Error sending message to content script:", chrome.runtime.lastError.message);
             // Potentially notify the user here if sending fails
