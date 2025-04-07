@@ -18,5 +18,5 @@ Guidelines for the Korean translation:
 - Match the energy level and directness typical in male peer-to-peer communication
 
 Your output should be translated Korean text, without any additional commentary or explanation. Just the translation.
-  `;
+  `.trim();
 }
