@@ -16,8 +16,8 @@ function getSelectedText() {
     const range = selection.getRangeAt(0);
     const rect = range.getBoundingClientRect();
     position = {
-      x: rect.left + (rect.width / 2),
-      y: rect.bottom
+      x: rect.left + 40,
+      y: rect.bottom + 40
     };
   }
 

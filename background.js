@@ -82,6 +82,13 @@ function displayResultInContentScript(tabId, resultText, position) {
         action: "displayResult",
         text: resultText,
         position: position,
+    }, () => { // Add callback to check for errors
+        if (chrome.runtime.lastError) {
+            // Log a warning instead of throwing an unhandled error
+            console.warn(`LumiVue: Could not send 'displayResult' to tab ${tabId}. Error: ${chrome.runtime.lastError.message}. This might happen on special pages, if the tab was closed, or if the content script isn't ready.`);
+            // Optional: Could use chrome.notifications API here if you want to explicitly tell the user
+            // chrome.notifications.create({ type: 'basic', iconUrl: 'icons/icon48.png', title: 'LumiVue Info', message: `Could not display result on the page. You might need to reload the tab or try on a different page.` });
+        }
     });
 }
 
@@ -111,8 +118,9 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     // Send message to content script to get text and position
     chrome.tabs.sendMessage(tab.id, { action: "getText", source: "contextMenu" }, async (response) => {
         if (chrome.runtime.lastError) {
-            console.error("Error sending message to content script:", chrome.runtime.lastError.message);
-            // Potentially notify the user here if sending fails
+            // Log a more specific error and attempt to inform the user via the content script (might also fail)
+            console.error(`LumiVue: Error sending 'getText' (context menu) to tab ${tab.id}: ${chrome.runtime.lastError.message}.`);
+            displayResultInContentScript(tab.id, `Error: Could not communicate with the page. Try reloading the tab or using LumiVue on a different page. (${chrome.runtime.lastError.message})`, null);
             return;
         }
         if (response && response.text) {
@@ -141,7 +149,9 @@ chrome.commands.onCommand.addListener(async (command, tab) => {
     // Send message to content script to get text and position
     chrome.tabs.sendMessage(tab.id, { action: "getText", source: "shortcut" }, async (response) => {
         if (chrome.runtime.lastError) {
-            console.error("Error sending message to content script:", chrome.runtime.lastError.message);
+            // Log a more specific error and attempt to inform the user via the content script (might also fail)
+            console.error(`LumiVue: Error sending 'getText' (shortcut) to tab ${tab.id}: ${chrome.runtime.lastError.message}.`);
+            displayResultInContentScript(tab.id, `Error: Could not communicate with the page. Try reloading the tab or using LumiVue on a different page. (${chrome.runtime.lastError.message})`, null);
             return;
         }
         if (response && response.text) {
