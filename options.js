@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const saveButton = document.getElementById('saveButton');
   const resetPromptButton = document.getElementById('resetPromptButton');
   const statusSpan = document.getElementById('status');
+  const toggleApiKeyButton = document.getElementById('toggleApiKey');
 
   // Load saved settings on page load
   chrome.storage.sync.get(['openaiApiKey', 'systemPrompt'], (data) => {
@@ -20,12 +21,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Toggle API key visibility
+  toggleApiKeyButton.addEventListener('click', () => {
+    const icon = toggleApiKeyButton.querySelector('i');
+    if (apiKeyInput.type === 'password') {
+      apiKeyInput.type = 'text';
+      icon.classList.remove('fa-eye');
+      icon.classList.add('fa-eye-slash');
+    } else {
+      apiKeyInput.type = 'password';
+      icon.classList.remove('fa-eye-slash');
+      icon.classList.add('fa-eye');
+    }
+  });
+
   // Reset system prompt to default
   resetPromptButton.addEventListener('click', () => {
     systemPromptInput.value = getDefaultSystemPrompt();
-    statusSpan.textContent = 'Save to apply changes.';
-    statusSpan.style.color = 'blue';
-    setTimeout(() => { statusSpan.textContent = ''; }, 3000);
+    showStatus('Prompt reset to default. Save to apply changes.', 'blue');
   });
 
   // Save settings on button click
@@ -58,10 +71,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Save all settings
     chrome.storage.sync.set(settings, () => {
-      statusSpan.textContent = message;
-      statusSpan.style.color = 'green';
+      showStatus(message, 'green');
       console.log('Settings saved:', settings);
-      setTimeout(() => { statusSpan.textContent = ''; }, 3000); // Clear status after 3s
     });
   });
+
+  // Helper function to show status messages
+  function showStatus(message, color) {
+    statusSpan.textContent = message;
+    statusSpan.style.color = color || 'var(--success-color)';
+    statusSpan.classList.add('visible');
+
+    setTimeout(() => {
+      statusSpan.classList.remove('visible');
+      setTimeout(() => { statusSpan.textContent = ''; }, 300);
+    }, 3000);
+  }
 });
