@@ -154,13 +154,3 @@ chrome.commands.onCommand.addListener(async (command, tab) => {
   }
 });
 
-// Listen for messages (e.g., from options page to check key validity)
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.action === "checkApiKey") {
-    // Optional: Implement a basic check if the key looks valid or even make a test API call
-    // For now, just acknowledge
-    console.log("Received checkApiKey request (implementation pending).");
-    sendResponse({ status: "received" });
-    return true; // Indicates asynchronous response (optional here)
-  }
-});
