@@ -1,7 +1,8 @@
-import { getDefaultSystemPrompt, getDefaultMaxTokens, getDefaultTemperature, GROQ_MODELS } from './utils.js';
+import { getDefaultSystemPrompt, getDefaultMaxTokens, getDefaultTemperature, getDefaultModel } from './utils.js';
 
 // --- Constants ---
-const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+// const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+const API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 const CONTEXT_MENU_ID = "LUMIVUE_CONTEXT_MENU";
 
 // --- Helper Functions ---
@@ -12,10 +13,10 @@ const CONTEXT_MENU_ID = "LUMIVUE_CONTEXT_MENU";
  */
 async function getStoredSettings() {
   const result = await chrome.storage.sync.get(
-    ['groqApiKey', 'groqModel', 'systemPrompt', 'maxTokens', 'temperature']);
+    ['apiKey', 'model', 'systemPrompt', 'maxTokens', 'temperature']);
   return {
-    apiKey: result.groqApiKey || null,
-    model: result.groqModel || GROQ_MODELS[0].code,
+    apiKey: result.apiKey || null,
+    model: result.model || getDefaultModel(),
     systemPrompt: result.systemPrompt || getDefaultSystemPrompt(),
     maxTokens: result.maxTokens !== undefined ? result.maxTokens : getDefaultMaxTokens(),
     temperature: result.temperature !== undefined ? result.temperature : getDefaultTemperature(),
@@ -23,8 +24,8 @@ async function getStoredSettings() {
 }
 
 /**
- * Calls the Groq API.
- * @param {string} apiKey - The Groq API key.
+ * Calls the OpenRouter API.
+ * @param {string} apiKey - The OpenRouter API key.
  * @param {string} text - The text to process.
  * @returns {Promise<string>} The processed text from Groq.
  */
@@ -35,7 +36,7 @@ async function callGroq(text, settings) {
   if (!settings.apiKey) {
     // Direct the user to the options page if the key is missing
     chrome.runtime.openOptionsPage();
-    return "Groq API key not set. Please set it in the extension options.";
+    return "OpenRouter API key not set. Please set it in the extension options.";
   }
 
   try {
@@ -58,7 +59,7 @@ async function callGroq(text, settings) {
 
     if (!response.ok) {
       const errorData = await response.json();
-      console.error("Groq API Error:", errorData);
+      console.error("OpenRouter API Error:", errorData);
       throw new Error(`API Error (${response.status}): ${errorData.error?.message || 'Unknown error'}`);
     }
 
@@ -110,7 +111,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   if (info.menuItemId === CONTEXT_MENU_ID && tab?.id) {
     const settings = await getStoredSettings();
     if (!settings.apiKey) {
-        displayResultInContentScript(tab.id, "Groq API key not set. Please set it in the extension options.", null);
+        displayResultInContentScript(tab.id, "OpenRouter API key not set. Please set it in the extension options.", null);
         chrome.runtime.openOptionsPage();
         return;
     }
@@ -141,7 +142,7 @@ chrome.commands.onCommand.addListener(async (command, tab) => {
   if (command === "trigger-lumivue" && tab?.id) {
     const settings = await getStoredSettings();
      if (!settings.apiKey) {
-        displayResultInContentScript(tab.id, "Groq API key not set. Please set it in the extension options.", null);
+        displayResultInContentScript(tab.id, "OpenRouter API key not set. Please set it in the extension options.", null);
         chrome.runtime.openOptionsPage();
         return;
     }

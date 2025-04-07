@@ -73,10 +73,9 @@ function showResultPopup(text, position) {
 
   // Positioning
   if (position) {
-    // Position near the mouse click/selection
     resultPopup.style.position = 'absolute';
-    resultPopup.style.left = `${position.x + window.scrollX + 5}px`; // Offset slightly
-    resultPopup.style.top = `${position.y + window.scrollY + 5}px`;
+    resultPopup.style.left = `${position.x + window.scrollX}px`;
+    resultPopup.style.top = `${position.y + window.scrollY}px`;
   } else {
     // Default to top-center if no position provided
     resultPopup.style.position = 'fixed';

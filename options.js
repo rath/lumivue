@@ -1,4 +1,4 @@
-import { getDefaultSystemPrompt, getDefaultMaxTokens, getDefaultTemperature, GROQ_MODELS } from './utils.js';
+import { getDefaultSystemPrompt, getDefaultMaxTokens, getDefaultTemperature, getDefaultModel } from './utils.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const apiKeyInput = document.getElementById('apiKey');
@@ -11,11 +11,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const resetPromptButton = document.getElementById('resetPromptButton');
   const statusSpan = document.getElementById('status');
   const toggleApiKeyButton = document.getElementById('toggleApiKey');
+  const modelField = document.getElementById('modelSelect');
 
   // Load saved settings on page load
-  chrome.storage.sync.get(['groqApiKey', 'groqModel', 'systemPrompt', 'maxTokens', 'temperature'], (data) => {
-    if (data.groqApiKey) {
-      apiKeyInput.value = data.groqApiKey;
+  chrome.storage.sync.get(['apiKey', 'model', 'systemPrompt', 'maxTokens', 'temperature'], (data) => {
+    if (data.apiKey) {
+      apiKeyInput.value = data.apiKey;
     }
 
     if (data.systemPrompt) {
@@ -34,43 +35,8 @@ document.addEventListener('DOMContentLoaded', () => {
     temperatureInput.value = temperature;
     temperatureValue.textContent = temperature;
 
-    // Populate model select dropdown
-    populateModelSelect();
-
-    // Set selected model if saved
-    if (data.groqModel) {
-      document.getElementById('modelSelect').value = data.groqModel;
-    }
+    modelField.value = data.model ?? getDefaultModel();
   });
-
-  // Populate the model select dropdown
-  function populateModelSelect() {
-    const modelSelect = document.getElementById('modelSelect');
-
-    // Clear existing options
-    modelSelect.innerHTML = '';
-
-    // Add models that have a valid code (some models might be previews without codes)
-    GROQ_MODELS.forEach(model => {
-      if (model.code) {
-        const option = document.createElement('option');
-        option.value = model.code;
-        option.textContent = `${model.model} - ${model.price_input} in / ${model.price_output} out`;
-        modelSelect.appendChild(option);
-      }
-    });
-
-    // Set default to first available model if none selected
-    if (!modelSelect.value && modelSelect.options.length > 0) {
-      modelSelect.selectedIndex = 0;
-    }
-
-    // Add change event listener to automatically save when model is changed
-    modelSelect.addEventListener('change', () => {
-      saveSettings();
-      showStatus('Model updated and settings saved!', 'var(--success-color)');
-    });
-  }
 
   // Update displayed values when sliders change
   maxTokensInput.addEventListener('input', () => {
@@ -113,10 +79,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Handle API key
     if (apiKey) {
-      settings.groqApiKey = apiKey;
+      settings.apiKey = apiKey;
     } else {
       // Clear the key if the input is empty
-      chrome.storage.sync.remove('groqApiKey');
+      chrome.storage.sync.remove('apiKey');
     }
 
     // Handle system prompt
@@ -129,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     settings.maxTokens = maxTokens;
     settings.temperature = temperature;
-    settings.groqModel = selectedModel;
+    settings.model = selectedModel;
 
     chrome.storage.sync.set(settings, () => {
       console.log('Settings saved:', settings);

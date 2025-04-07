@@ -215,21 +215,3 @@ input[type="range"]::-webkit-slider-thumb:hover {
   color: var(--secondary-text);
   margin-bottom: 0.5rem;
 }
-
-.model-select {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius);
-  margin-bottom: 1rem;
-  font-size: 0.95rem;
-  transition: var(--transition);
-  background-color: white;
-  cursor: pointer;
-}
-
-.model-select:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
-}
