@@ -1,5 +1,5 @@
 #lumivue-result-popup {
-  position: absolute; /* Will be overridden if fixed positioning is needed */
+  position: absolute;
   background-color: #f9f9f9;
   border: 1px solid #ccc;
   border-radius: 5px;
@@ -14,11 +14,11 @@
   overflow-wrap: break-word;
 }
 
-#lumivue-result-popup pre { /* Style preformatted text if OpenAI returns markdown code blocks */
+#lumivue-result-popup pre {
     background-color: #eee;
     padding: 10px;
     border-radius: 3px;
-    white-space: pre-wrap; /* Wrap long lines */
+    white-space: pre-wrap;
     word-wrap: break-word;
 }
 

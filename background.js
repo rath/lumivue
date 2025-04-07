@@ -1,8 +1,6 @@
 import { getDefaultSystemPrompt, getDefaultMaxTokens, getDefaultTemperature } from './utils.js';
 
 // --- Constants ---
-// const API_URL = 'https://api.openai.com/v1/chat/completions';
-// const API_URL = 'http://127.0.0.1:8080/v1/chat/completions';
 const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const CONTEXT_MENU_ID = "LUMIVUE_CONTEXT_MENU";
 
@@ -13,9 +11,9 @@ const CONTEXT_MENU_ID = "LUMIVUE_CONTEXT_MENU";
  * @returns {Promise<Object>} Object containing API key and system prompt.
  */
 async function getStoredSettings() {
-  const result = await chrome.storage.sync.get(['openaiApiKey', 'systemPrompt', 'maxTokens', 'temperature']);
+  const result = await chrome.storage.sync.get(['groqApiKey', 'systemPrompt', 'maxTokens', 'temperature']);
   return {
-    apiKey: result.openaiApiKey || null,
+    apiKey: result.groqApiKey || null,
     systemPrompt: result.systemPrompt || getDefaultSystemPrompt(),
     maxTokens: result.maxTokens !== undefined ? result.maxTokens : getDefaultMaxTokens(),
     temperature: result.temperature !== undefined ? result.temperature : getDefaultTemperature(),
@@ -23,19 +21,19 @@ async function getStoredSettings() {
 }
 
 /**
- * Calls the OpenAI API.
- * @param {string} apiKey - The OpenAI API key.
+ * Calls the Groq API.
+ * @param {string} apiKey - The Groq API key.
  * @param {string} text - The text to process.
- * @returns {Promise<string>} The processed text from OpenAI.
+ * @returns {Promise<string>} The processed text from Groq.
  */
-async function callOpenAI(apiKey, text, settings) {
+async function callGroq(apiKey, text, settings) {
   if (!text || text.trim().length === 0) {
     return "No text provided.";
   }
   if (!apiKey) {
     // Direct the user to the options page if the key is missing
     chrome.runtime.openOptionsPage();
-    return "OpenAI API key not set. Please set it in the extension options.";
+    return "Groq API key not set. Please set it in the extension options.";
   }
 
   try {
@@ -58,7 +56,7 @@ async function callOpenAI(apiKey, text, settings) {
 
     if (!response.ok) {
       const errorData = await response.json();
-      console.error("OpenAI API Error:", errorData);
+      console.error("Groq API Error:", errorData);
       throw new Error(`API Error (${response.status}): ${errorData.error?.message || 'Unknown error'}`);
     }
 
@@ -66,7 +64,7 @@ async function callOpenAI(apiKey, text, settings) {
     return data.choices[0]?.message?.content?.trim() || "No response from AI.";
 
   } catch (error) {
-    console.error('Error calling OpenAI:', error);
+    console.error('Error calling Groq:', error);
     return `Error: ${error.message}`;
   }
 }
@@ -103,7 +101,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   if (info.menuItemId === CONTEXT_MENU_ID && tab?.id) {
     const settings = await getStoredSettings();
     if (!settings.apiKey) {
-        displayResultInContentScript(tab.id, "OpenAI API key not set. Please set it in the extension options.", null);
+        displayResultInContentScript(tab.id, "Groq API key not set. Please set it in the extension options.", null);
         chrome.runtime.openOptionsPage();
         return;
     }
@@ -117,7 +115,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
         }
         if (response && response.text) {
             displayResultInContentScript(tab.id, "Processing...", response.position); // Show loading state
-            const result = await callOpenAI(settings.apiKey, response.text, settings);
+            const result = await callGroq(settings.apiKey, response.text, settings);
             displayResultInContentScript(tab.id, result, response.position);
         } else {
             console.log("No text received from content script or context menu.");
@@ -133,7 +131,7 @@ chrome.commands.onCommand.addListener(async (command, tab) => {
   if (command === "trigger-lumivue" && tab?.id) {
     const settings = await getStoredSettings();
      if (!settings.apiKey) {
-        displayResultInContentScript(tab.id, "OpenAI API key not set. Please set it in the extension options.", null);
+        displayResultInContentScript(tab.id, "Groq API key not set. Please set it in the extension options.", null);
         chrome.runtime.openOptionsPage();
         return;
     }
@@ -147,7 +145,7 @@ chrome.commands.onCommand.addListener(async (command, tab) => {
         if (response && response.text) {
             const position = response.position || { x: 0, y: 0 };
             displayResultInContentScript(tab.id, "Processing...", position);
-            const result = await callOpenAI(settings.apiKey, response.text, settings);
+            const result = await callGroq(settings.apiKey, response.text, settings);
             displayResultInContentScript(tab.id, result, position);
         } else {
             console.log("No text received from content script for shortcut.");

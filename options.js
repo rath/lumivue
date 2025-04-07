@@ -13,9 +13,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const toggleApiKeyButton = document.getElementById('toggleApiKey');
 
   // Load saved settings on page load
-  chrome.storage.sync.get(['openaiApiKey', 'systemPrompt', 'maxTokens', 'temperature'], (data) => {
-    if (data.openaiApiKey) {
-      apiKeyInput.value = data.openaiApiKey;
+  chrome.storage.sync.get(['groqApiKey', 'systemPrompt', 'maxTokens', 'temperature'], (data) => {
+    if (data.groqApiKey) {
+      apiKeyInput.value = data.groqApiKey;
     }
 
     if (data.systemPrompt) {
@@ -75,10 +75,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Handle API key
     if (apiKey) {
-      settings.openaiApiKey = apiKey;
+      settings.groqApiKey = apiKey;
     } else {
       // Clear the key if the input is empty
-      chrome.storage.sync.remove('openaiApiKey');
+      chrome.storage.sync.remove('groqApiKey');
     }
 
     // Handle system prompt
