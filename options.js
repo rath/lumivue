@@ -1,4 +1,4 @@
-import { getDefaultSystemPrompt, getDefaultMaxTokens, getDefaultTemperature } from './utils.js';
+import { getDefaultSystemPrompt, getDefaultMaxTokens, getDefaultTemperature, GROQ_MODELS } from './utils.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const apiKeyInput = document.getElementById('apiKey');
@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const toggleApiKeyButton = document.getElementById('toggleApiKey');
 
   // Load saved settings on page load
-  chrome.storage.sync.get(['groqApiKey', 'systemPrompt', 'maxTokens', 'temperature'], (data) => {
+  chrome.storage.sync.get(['groqApiKey', 'groqModel', 'systemPrompt', 'maxTokens', 'temperature'], (data) => {
     if (data.groqApiKey) {
       apiKeyInput.value = data.groqApiKey;
     }
@@ -33,7 +33,38 @@ document.addEventListener('DOMContentLoaded', () => {
     const temperature = data.temperature !== undefined ? data.temperature : getDefaultTemperature();
     temperatureInput.value = temperature;
     temperatureValue.textContent = temperature;
+
+    // Populate model select dropdown
+    populateModelSelect();
+
+    // Set selected model if saved
+    if (data.groqModel) {
+      document.getElementById('modelSelect').value = data.groqModel;
+    }
   });
+
+  // Populate the model select dropdown
+  function populateModelSelect() {
+    const modelSelect = document.getElementById('modelSelect');
+
+    // Clear existing options
+    modelSelect.innerHTML = '';
+
+    // Add models that have a valid code (some models might be previews without codes)
+    GROQ_MODELS.forEach(model => {
+      if (model.code) {
+        const option = document.createElement('option');
+        option.value = model.code;
+        option.textContent = `${model.model} - ${model.price_input} in / ${model.price_output} out`;
+        modelSelect.appendChild(option);
+      }
+    });
+
+    // Set default to first available model if none selected
+    if (!modelSelect.value && modelSelect.options.length > 0) {
+      modelSelect.selectedIndex = 0;
+    }
+  }
 
   // Update displayed values when sliders change
   maxTokensInput.addEventListener('input', () => {
@@ -70,6 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const systemPrompt = systemPromptInput.value.trim();
     const maxTokens = parseInt(maxTokensInput.value);
     const temperature = parseFloat(temperatureInput.value);
+    const selectedModel = document.getElementById('modelSelect').value;
 
     const settings = {};
 
@@ -91,6 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     settings.maxTokens = maxTokens;
     settings.temperature = temperature;
+    settings.groqModel = selectedModel;
 
     chrome.storage.sync.set(settings, () => {
       console.log('Settings saved:', settings);
