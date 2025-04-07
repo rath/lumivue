@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Reset system prompt to default
   resetPromptButton.addEventListener('click', () => {
     systemPromptInput.value = getDefaultSystemPrompt();
-    statusSpan.textContent = 'System prompt reset to default. Click Save to apply.';
+    statusSpan.textContent = 'Save to apply changes.';
     statusSpan.style.color = 'blue';
     setTimeout(() => { statusSpan.textContent = ''; }, 3000);
   });

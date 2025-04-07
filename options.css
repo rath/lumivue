@@ -1,7 +1,7 @@
 body {
   font-family: sans-serif;
   padding: 20px;
-  min-width: 350px; /* Prevent popup from being too small */
+  min-width: 480px;
   background-color: #f4f4f4;
 }
 
@@ -40,11 +40,11 @@ textarea {
   resize: vertical;
   min-height: 150px;
   font-family: monospace;
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.4;
 }
 
-button {
+button#saveButton {
   background-color: #007bff;
   color: white;
   border: none;
@@ -55,7 +55,7 @@ button {
   transition: background-color 0.2s ease;
 }
 
-button:hover {
+button#saveButton:hover {
   background-color: #0056b3;
 }
 
