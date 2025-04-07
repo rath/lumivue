@@ -64,6 +64,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!modelSelect.value && modelSelect.options.length > 0) {
       modelSelect.selectedIndex = 0;
     }
+
+    // Add change event listener to automatically save when model is changed
+    modelSelect.addEventListener('change', () => {
+      saveSettings();
+      showStatus('Model updated and settings saved!', 'var(--success-color)');
+    });
   }
 
   // Update displayed values when sliders change
@@ -95,8 +101,8 @@ document.addEventListener('DOMContentLoaded', () => {
     showStatus('Prompt reset to default. Save to apply changes.', 'blue');
   });
 
-  // Save settings on button click
-  saveButton.addEventListener('click', () => {
+  // Function to save all settings
+  function saveSettings() {
     const apiKey = apiKeyInput.value.trim();
     const systemPrompt = systemPromptInput.value.trim();
     const maxTokens = parseInt(maxTokensInput.value);
@@ -128,6 +134,12 @@ document.addEventListener('DOMContentLoaded', () => {
     chrome.storage.sync.set(settings, () => {
       console.log('Settings saved:', settings);
     });
+  }
+
+  // Save settings on button click
+  saveButton.addEventListener('click', () => {
+    saveSettings();
+    showStatus('Settings saved successfully!', 'var(--success-color)');
   });
 
   // Helper function to show status messages
