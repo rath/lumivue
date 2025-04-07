@@ -76,9 +76,7 @@ function showResultPopup(text, position) {
   }
 
   document.body.appendChild(resultPopup);
-
-  // Optional: Auto-remove after a delay? Or only on close click/click outside.
-   // Add listener to close popup if clicking outside of it
+  // Add listener to close popup if clicking outside of it
   document.addEventListener('click', handleClickOutside, true); // Use capture phase
 }
 
@@ -124,6 +122,4 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     sendResponse({ text: text, position: position });
   }
-  // Indicate asynchronous response if needed, though not strictly necessary here
-  // return true;
 });
