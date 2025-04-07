@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "LumiVue",
   "version": "1.0",
-  "description": "Summarize or translate selected text or entire pages using AI",
+  "description": "Translate selected text or entire pages using AI",
   "author": "Jang-Ho Hwang <rath@told.me>",
   "homepage_url": "https://github.com/rath/lumivue",
   "icons": {
@@ -35,14 +35,11 @@
         "default": "Ctrl+Shift+E",
         "mac": "Command+Shift+E"
       },
-      "description": "Trigger LumiVue action (Summarize/Translate)"
+      "description": "Trigger LumiVue action (Translate)"
     }
   },
   "action": {
     "default_title": "LumiVue Settings",
     "default_popup": "options.html"
-  },
-  "host_permissions": [
-    "https://api.groq.com/"
-  ]
+  }
 }
