@@ -1,0 +1,41 @@
+#lumivue-result-popup {
+  position: absolute; /* Will be overridden if fixed positioning is needed */
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 2147483647; /* Max z-index */
+  max-width: 400px;
+  font-family: sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #333;
+  overflow-wrap: break-word;
+}
+
+#lumivue-result-popup pre { /* Style preformatted text if OpenAI returns markdown code blocks */
+    background-color: #eee;
+    padding: 10px;
+    border-radius: 3px;
+    white-space: pre-wrap; /* Wrap long lines */
+    word-wrap: break-word;
+}
+
+#lumivue-close-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: none;
+  border: none;
+  font-size: 18px;
+  font-weight: bold;
+  color: #aaa;
+  cursor: pointer;
+  padding: 0 5px;
+  line-height: 1;
+}
+
+#lumivue-close-button:hover {
+  color: #333;
+}

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>LumiVue Options</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <h1>LumiVue Options</h1>
+
+  <div class="option">
+    <label for="apiKey">OpenAI API Key:</label>
+    <input type="password" id="apiKey" name="apiKey" size="50">
+    <button id="saveButton">Save</button>
+    <span id="status"></span>
+  </div>
+
+  <p class="note">
+    Your API key is stored securely using Chrome's storage and only used to communicate with the OpenAI API.
+  </p>
+
+  <script src="options.js"></script>
+</body>
+</html>

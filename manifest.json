@@ -1,0 +1,39 @@
+{
+  "manifest_version": 3,
+  "name": "LumiVue",
+  "version": "1.0",
+  "description": "Summarize or translate selected text or entire pages using AI",
+  "permissions": [
+    "storage",
+    "contextMenus",
+    "activeTab",
+    "scripting"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["popup.css"]
+    }
+  ],
+  "options_page": "options.html",
+  "commands": {
+    "trigger-lumivue": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+E",
+        "mac": "Command+Shift+E"
+      },
+      "description": "Trigger LumiVue action (Summarize/Translate)"
+    }
+  },
+  "action": {
+    "default_title": "LumiVue Options",
+    "default_popup": "options.html"
+  },
+  "host_permissions": [
+    "https://api.openai.com/"
+  ]
+}
