@@ -1,6 +1,5 @@
 #!/bin/sh
-sips -z 128 128 1024.png --out icon128.png
-sips -z 48 48 1024.png --out icon48.png
-sips -z 32 32 1024.png --out icon32.png
-sips -z 16 16 1024.png --out icon16.png
-
+rsvg-convert -h 128 icon.svg > icon128.png
+rsvg-convert -h 48  icon.svg > icon48.png
+rsvg-convert -h 32  icon.svg > icon32.png
+rsvg-convert -h 16  icon.svg > icon16.png
