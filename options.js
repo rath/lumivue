@@ -27,7 +27,14 @@ document.addEventListener('DOMContentLoaded', () => {
         data.data.forEach(model => {
           const option = document.createElement('option');
           option.value = model.id;
-          option.textContent = model.name || model.id;
+          // Format pricing information if available
+          let pricingText = '';
+          if (model.pricing) {
+            const promptPrice = (parseFloat(model.pricing.prompt) * 1000000).toFixed(2);
+            const completionPrice = (parseFloat(model.pricing.completion) * 1000000).toFixed(2);
+            pricingText = ` (In️ $${promptPrice}, Out️ $${completionPrice}) / 1M tokens`;
+          }
+          option.textContent = `${model.name || model.id}${pricingText}`;
           modelList.appendChild(option);
         });
       }
