@@ -42,11 +42,11 @@ Korean male speech using AI.
 
 ## Settings
 
-- **API Key**: Your OpenRouter API key (required)
-- **Model**: The AI model to use (default: `google/gemini-2.0-flash-001`)
-- **System Prompt**: Instructions for the AI on how to translate text
-- **Max Tokens**: Maximum length of the AI response (default: 1000)
-- **Temperature**: Controls randomness in the AI response (default: 0.6)
+- **API Key**: Your OpenRouter API key (required). Stored securely in Chrome's storage.
+- **Model**: Select the AI model from OpenRouter. Start typing in the field to see a list of available models fetched directly from the OpenRouter API, including their names and pricing information. (Default: `google/gemini-2.0-flash-001`)
+- **System Prompt**: Instructions for the AI on how to translate text. You can customize this or reset it to the default.
+- **Max Tokens**: Maximum length of the AI response (default: 1000). Adjustable via a slider.
+- **Temperature**: Controls randomness in the AI response (default: 0.6). Lower values (e.g., 0.2) produce more focused results, while higher values (e.g., 0.8) lead to more creative outputs. Adjustable via a slider.
 
 ## Default System Prompt
 
