@@ -14,7 +14,7 @@ function getSelectedText() {
     const rect = range.getBoundingClientRect();
     position = {
       x: rect.left + 40,
-      y: rect.bottom - 40
+      y: rect.bottom + 15
     };
   }
 
