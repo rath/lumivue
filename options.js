@@ -12,6 +12,29 @@ document.addEventListener('DOMContentLoaded', () => {
   const statusSpan = document.getElementById('status');
   const toggleApiKeyButton = document.getElementById('toggleApiKey');
   const modelField = document.getElementById('modelSelect');
+  const modelList = document.getElementById('modelList');
+
+  // Function to fetch models from OpenRouter API
+  async function fetchModels() {
+    try {
+      const response = await fetch('https://openrouter.ai/api/v1/models');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      if (data && data.data) {
+        modelList.innerHTML = '';
+        data.data.forEach(model => {
+          const option = document.createElement('option');
+          option.value = model.id;
+          option.textContent = model.name || model.id;
+          modelList.appendChild(option);
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching models:', error);
+    }
+  }
 
   // Load saved settings on page load
   chrome.storage.sync.get(['apiKey', 'model', 'systemPrompt', 'maxTokens', 'temperature'], (data) => {
@@ -36,6 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
     temperatureValue.textContent = temperature;
 
     modelField.value = data.model ?? getDefaultModel();
+    fetchModels();
   });
 
   // Update displayed values when sliders change

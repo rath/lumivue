@@ -13,8 +13,9 @@
       <div class="option-header">
         <label for="modelSelect">Model</label>
       </div>
-      <input type="text" id="modelSelect" name="modelSelect" class="model-select" />
-      <p class="setting-description">Select the OpenRouter model to use for generating responses.</p>
+      <input type="text" id="modelSelect" name="modelSelect" class="model-select" list="modelList" placeholder="Start typing to search models..." />
+      <datalist id="modelList"></datalist>
+      <p class="setting-description">Select the OpenRouter model to use for generating responses. Start typing to see suggestions.</p>
     </div>
 
     <div class="option">
